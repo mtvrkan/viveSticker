@@ -1,0 +1,12 @@
+{
+	"extends": "$app/tsconfig/service-worker",
+	"compilerOptions": {
+		"strict": true,
+		"noUncheckedIndexedAccess": true,
+		"noEmit": true,
+		"skipLibCheck": true,
+		"moduleResolution": "bundler",
+		"allowImportingTsExtensions": true
+	},
+	"include": ["./**/*.ts", "../lib/core/share.ts"]
+}

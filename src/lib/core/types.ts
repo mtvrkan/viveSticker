@@ -21,7 +21,9 @@ export type ImportErrorReason =
 	| 'decode-failed'
 	| 'fetch-blocked'
 	| 'fetch-failed'
-	| 'invalid-url';
+	| 'invalid-url'
+	| 'not-media'
+	| 'x-unavailable';
 
 export type ImportState =
 	| { status: 'idle' }

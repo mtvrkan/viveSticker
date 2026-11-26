@@ -62,6 +62,11 @@ export function parseHttpUrl(input: string): URL | null {
 	}
 }
 
+export function isWebPageType(type: string | null): boolean {
+	const normalized = type?.toLowerCase().split(';')[0]?.trim() ?? '';
+	return normalized === 'text/html' || normalized === 'application/xhtml+xml';
+}
+
 export function fileNameFromUrl(url: URL): string {
 	const last = decodeURIComponent(url.pathname.split('/').filter(Boolean).pop() ?? '');
 	return last || 'download';

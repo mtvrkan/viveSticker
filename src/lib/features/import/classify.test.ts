@@ -1,5 +1,12 @@
 import { describe, expect, it } from 'vitest';
-import { fileNameFromUrl, inspectAnimation, parseHttpUrl, resolveMime, validateSize } from './classify.ts';
+import {
+	fileNameFromUrl,
+	inspectAnimation,
+	isWebPageType,
+	parseHttpUrl,
+	resolveMime,
+	validateSize
+} from './classify.ts';
 
 function gifWithDelays(delays: number[]): Uint8Array {
 	const header = [0x47, 0x49, 0x46, 0x38, 0x39, 0x61];
@@ -135,5 +142,20 @@ describe('url helpers', () => {
 	it('derives a file name from the url path', () => {
 		expect(fileNameFromUrl(new URL('https://x.test/media/cat%20dance.gif?x=1'))).toBe('cat dance.gif');
 		expect(fileNameFromUrl(new URL('https://x.test/'))).toBe('download');
+	});
+});
+
+describe('isWebPageType', () => {
+	it('flags html pages, including a charset suffix', () => {
+		expect(isWebPageType('text/html; charset=utf-8')).toBe(true);
+		expect(isWebPageType('application/xhtml+xml')).toBe(true);
+	});
+
+	it('accepts media types', () => {
+		expect(isWebPageType('video/mp4')).toBe(false);
+	});
+
+	it('treats a missing header as not a page', () => {
+		expect(isWebPageType(null)).toBe(false);
 	});
 });

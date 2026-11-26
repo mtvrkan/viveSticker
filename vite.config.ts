@@ -13,5 +13,7 @@ export default defineConfig({
 			paths: { base: base === '' ? '' : `/${base.replace(/^\/+|\/+$/g, '')}` }
 		})
 	],
+	optimizeDeps: { exclude: ['@jsquash/webp'] },
+	worker: { format: 'es' },
 	test: { include: ['src/**/*.test.ts'] }
 });

@@ -5,10 +5,7 @@
 	let { reason, onretry }: { reason: ImportErrorReason; onretry: () => void } = $props();
 </script>
 
-<div
-	role="alert"
-	class="flex flex-col items-start gap-4 rounded-lg border border-destructive/30 bg-destructive-soft p-5 sm:p-6"
->
+<div role="alert" class="flex flex-col items-start gap-4 rounded-xl bg-destructive-soft p-5 sm:p-6">
 	<div class="flex items-start gap-3">
 		<svg
 			aria-hidden="true"
@@ -30,7 +27,7 @@
 	<button
 		type="button"
 		onclick={onretry}
-		class="min-h-11 rounded-md bg-foreground px-5 font-semibold text-background transition-opacity duration-(--duration-fast) hover:opacity-90"
+		class="min-h-11 rounded-full bg-foreground px-5 font-semibold text-background transition-opacity duration-(--duration-fast) hover:opacity-90"
 	>
 		{t('errorRetry')}
 	</button>

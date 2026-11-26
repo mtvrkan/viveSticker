@@ -1,24 +1,34 @@
 <script lang="ts">
+	import { replaceState } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
-	import type { ImportState } from '#lib/core/types.ts';
+	import type { ImportState, SourceMedia } from '#lib/core/types.ts';
 	import SkeletonCard from '#lib/components/SkeletonCard.svelte';
 	import { t } from '#lib/i18n/index.svelte.ts';
+	import { parseHttpUrl } from './classify.ts';
 	import DropZone from './DropZone.svelte';
 	import ImportError from './ImportError.svelte';
 	import MediaSummary from './MediaSummary.svelte';
 	import { fetchMediaFromUrl, ImportFailure, loadMedia } from './load-media.ts';
+	import { hasSharedFile, takeSharedFile } from './shared-file.ts';
+
+	let { oncontinue }: { oncontinue: (media: SourceMedia) => void } = $props();
 
 	let importState = $state<ImportState>({ status: 'idle' });
+	let ownedUrl: string | null = null;
 
 	function releaseCurrent() {
-		if (importState.status === 'ready') URL.revokeObjectURL(importState.media.objectUrl);
+		if (ownedUrl) URL.revokeObjectURL(ownedUrl);
+		ownedUrl = null;
 	}
 
 	async function open(blob: Blob, name: string) {
 		releaseCurrent();
 		importState = { status: 'loading', name };
 		try {
-			importState = { status: 'ready', media: await loadMedia(blob, name) };
+			const media = await loadMedia(blob, name);
+			ownedUrl = media.objectUrl;
+			importState = { status: 'ready', media };
 		} catch (error) {
 			importState = {
 				status: 'error',
@@ -41,6 +51,12 @@
 		}
 	}
 
+	function handOff(media: SourceMedia) {
+		ownedUrl = null;
+		importState = { status: 'idle' };
+		oncontinue(media);
+	}
+
 	function reset() {
 		releaseCurrent();
 		importState = { status: 'idle' };
@@ -51,11 +67,25 @@
 			const target = event.target as HTMLElement | null;
 			if (target?.closest('input, textarea')) return;
 			const file = event.clipboardData?.files[0];
-			if (!file) return;
+			if (file) {
+				event.preventDefault();
+				void open(file, file.name || 'clipboard');
+				return;
+			}
+			const text = event.clipboardData?.getData('text/plain').trim() ?? '';
+			if (!parseHttpUrl(text)) return;
 			event.preventDefault();
-			void open(file, file.name || 'clipboard');
+			void openUrl(text);
 		}
 		window.addEventListener('paste', onPaste);
+		if (hasSharedFile(location.search)) {
+			replaceState(resolve('/'), {});
+			void takeSharedFile()
+				.then((shared) => {
+					if (shared) return open(shared.blob, shared.name);
+				})
+				.catch(() => undefined);
+		}
 		return () => {
 			window.removeEventListener('paste', onPaste);
 			releaseCurrent();
@@ -63,19 +93,17 @@
 	});
 </script>
 
-<section aria-labelledby="import-title" class="flex flex-col gap-6">
-	<div class="flex flex-col gap-2">
-		<h1 id="import-title" class="text-2xl font-semibold tracking-tight sm:text-3xl">{t('importTitle')}</h1>
-		<p class="max-w-[60ch] text-muted-foreground">{t('importDescription')}</p>
-	</div>
-
+<section aria-labelledby="import-title" class="flex flex-col gap-4">
 	{#if importState.status === 'idle'}
 		<DropZone onfile={open} onurl={openUrl} />
-	{:else if importState.status === 'loading'}
-		<SkeletonCard label="{t('importLoading')}: {importState.name}" />
-	{:else if importState.status === 'ready'}
-		<MediaSummary media={importState.media} onreplace={reset} />
 	{:else}
-		<ImportError reason={importState.reason} onretry={reset} />
+		<h1 id="import-title" class="text-3xl font-bold tracking-tight">{t('importTitle')}</h1>
+		{#if importState.status === 'loading'}
+			<SkeletonCard label="{t('importLoading')}: {importState.name}" />
+		{:else if importState.status === 'ready'}
+			<MediaSummary media={importState.media} onreplace={reset} oncontinue={handOff} />
+		{:else}
+			<ImportError reason={importState.reason} onretry={reset} />
+		{/if}
 	{/if}
 </section>

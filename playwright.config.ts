@@ -6,7 +6,7 @@ export default defineConfig({
 	testDir: 'tests/e2e',
 	outputDir: process.env.PW_OUTPUT_DIR ?? 'test-results',
 	reporter: 'list',
-	use: { baseURL: `http://127.0.0.1:${port}/viveSticker/` },
+	use: { baseURL: `http://127.0.0.1:${port}/viveSticker/`, locale: 'tr-TR' },
 	webServer: {
 		command: `export BASE_PATH=viveSticker && pnpm build && pnpm preview --host 127.0.0.1 --port ${port} --strictPort`,
 		url: `http://127.0.0.1:${port}/viveSticker/`,

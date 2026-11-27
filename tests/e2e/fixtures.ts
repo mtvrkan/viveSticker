@@ -70,6 +70,8 @@ export async function recordedVideo(
 	page: Page
 ): Promise<{ buffer: Buffer; mime: string; name: string } | null> {
 	const result = await page.evaluate(async () => {
+		// Some WebKit builds (Windows, Linux CI) ship without MediaRecorder; the caller skips then.
+		if (typeof MediaRecorder === 'undefined') return null;
 		const types = ['video/webm;codecs=vp8', 'video/webm', 'video/mp4'];
 		const type = types.find((candidate) => MediaRecorder.isTypeSupported(candidate));
 		if (!type) return null;

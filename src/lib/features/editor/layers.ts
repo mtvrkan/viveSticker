@@ -5,10 +5,10 @@ type Context2D = CanvasRenderingContext2D | OffscreenCanvasRenderingContext2D;
 type CanvasLike = HTMLCanvasElement | OffscreenCanvas;
 
 export const FONT_STACKS: Record<FontId, { weight: number; family: string }> = {
-	sans: { weight: 700, family: '"Instrument Sans", system-ui, sans-serif' },
+	sans: { weight: 700, family: '"Instrument Sans Variable", "Instrument Sans", system-ui, sans-serif' },
 	display: { weight: 400, family: '"Anton", Impact, "Arial Black", sans-serif' },
 	hand: { weight: 700, family: '"Caveat", "Segoe Print", cursive' },
-	mono: { weight: 600, family: '"JetBrains Mono", ui-monospace, monospace' }
+	mono: { weight: 600, family: '"JetBrains Mono Variable", "JetBrains Mono", ui-monospace, monospace' }
 };
 
 const LINE_HEIGHT = 1.12;

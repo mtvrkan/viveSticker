@@ -14,5 +14,10 @@ export default ts.config(
 			parserOptions: { projectService: true, extraFileExtensions: ['.svelte'], parser: ts.parser }
 		}
 	},
+	{
+		// Internal links go through `pageHref` (src/lib/seo/links.ts), which calls resolve() and adds the
+		// locale prefix; the rule only recognises a literal resolve() at the link. goto/pushState stay checked.
+		rules: { 'svelte/no-navigation-without-resolve': ['error', { ignoreLinks: true }] }
+	},
 	{ ignores: ['build/', '.svelte-kit/', 'node_modules/'] }
 );

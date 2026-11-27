@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { replaceState } from '$app/navigation';
-	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
 	import type { ImportState, SourceMedia } from '#lib/core/types.ts';
 	import SkeletonCard from '#lib/components/SkeletonCard.svelte';
@@ -12,7 +11,8 @@
 	import { fetchMediaFromUrl, ImportFailure, loadMedia } from './load-media.ts';
 	import { hasSharedFile, takeSharedFile } from './shared-file.ts';
 
-	let { oncontinue }: { oncontinue: (media: SourceMedia) => void } = $props();
+	let { oncontinue, heading = 'h1' }: { oncontinue: (media: SourceMedia) => void; heading?: 'h1' | 'h2' } =
+		$props();
 
 	let importState = $state<ImportState>({ status: 'idle' });
 	let ownedUrl: string | null = null;
@@ -79,7 +79,9 @@
 		}
 		window.addEventListener('paste', onPaste);
 		if (hasSharedFile(location.search)) {
-			replaceState(resolve('/'), {});
+			// Drop the one-shot share flag but stay on this page and language.
+			// eslint-disable-next-line svelte/no-navigation-without-resolve -- the current path is already resolved
+			replaceState(location.pathname, {});
 			void takeSharedFile()
 				.then((shared) => {
 					if (shared) return open(shared.blob, shared.name);
@@ -95,9 +97,11 @@
 
 <section aria-labelledby="import-title" class="flex flex-col gap-4">
 	{#if importState.status === 'idle'}
-		<DropZone onfile={open} onurl={openUrl} />
+		<DropZone onfile={open} onurl={openUrl} {heading} />
 	{:else}
-		<h1 id="import-title" class="text-3xl font-bold tracking-tight">{t('importTitle')}</h1>
+		<svelte:element this={heading} id="import-title" class="text-3xl font-bold tracking-tight">
+			{t('importTitle')}
+		</svelte:element>
 		{#if importState.status === 'loading'}
 			<SkeletonCard label="{t('importLoading')}: {importState.name}" />
 		{:else if importState.status === 'ready'}

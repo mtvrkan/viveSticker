@@ -1,6 +1,13 @@
 import { assets, immutable, prerendered } from '$app/manifest';
 import { self as worker } from '$app/service-worker';
-import { SHARE_CACHE, SHARE_FIELD, SHARE_KEY, SHARE_NAME_HEADER, SHARE_PARAM } from '#lib/core/share.ts';
+import {
+	SHARE_CACHE,
+	SHARE_FIELD,
+	SHARE_KEY,
+	SHARE_NAME_HEADER,
+	SHARE_PARAM,
+	SKIP_WAITING
+} from '#lib/core/share.ts';
 
 const scope = new URL('./', worker.location.href);
 const base = scope.pathname.replace(/\/$/, '');
@@ -14,22 +21,25 @@ function fingerprint(values: string[]): string {
 
 const CORE = `core-${fingerprint([...immutable, ...assets].map((entry) => entry.path))}`;
 const HEAVY = 'heavy-v1';
-const FONTS = 'fonts-v1';
+const FONTS = 'fonts-v2';
 const KEPT = new Set([CORE, HEAVY, FONTS, SHARE_CACHE]);
-const FONT_HOSTS = new Set(['fonts.googleapis.com', 'fonts.gstatic.com']);
 
 const isHeavy = (path: string) => path.endsWith('.wasm') || path.endsWith('.tflite');
+// Font packages ship every unicode subset and the browser fetches only the ones a page needs,
+// so fonts are cached on first use instead of precaching cyrillic/greek/vietnamese files.
+const isFont = (path: string) => path.endsWith('.woff2') || path.endsWith('.woff');
+const isMeta = (path: string) => path.endsWith('/.nojekyll') || path.endsWith('/CNAME');
 const known = new Set([...immutable, ...assets, ...prerendered].map((entry) => toPath(entry.path)));
 known.add(`${base}/`);
-const precache = [...known].filter((path) => !isHeavy(path) && !path.endsWith('/.nojekyll'));
+const precache = [...known].filter((path) => !isHeavy(path) && !isFont(path) && !isMeta(path));
 
 worker.addEventListener('install', (event) => {
-	event.waitUntil(
-		caches
-			.open(CORE)
-			.then((cache) => cache.addAll(precache))
-			.then(() => worker.skipWaiting())
-	);
+	event.waitUntil(caches.open(CORE).then((cache) => cache.addAll(precache)));
+});
+
+// A new version waits until the page asks for it, so an open editor is never swapped mid-edit.
+worker.addEventListener('message', (event) => {
+	if (event.data === SKIP_WAITING) void worker.skipWaiting();
 });
 
 worker.addEventListener('activate', (event) => {
@@ -48,18 +58,6 @@ async function cacheFirst(request: Request, name: string): Promise<Response> {
 	const response = await fetch(request);
 	if (response.ok) await cache.put(request, response.clone());
 	return response;
-}
-
-async function staleWhileRevalidate(request: Request): Promise<Response> {
-	const cache = await caches.open(FONTS);
-	const hit = await cache.match(request);
-	const network = fetch(request)
-		.then(async (response) => {
-			if (response.ok || response.type === 'opaque') await cache.put(request, response.clone());
-			return response;
-		})
-		.catch(() => hit ?? Response.error());
-	return hit ?? network;
 }
 
 async function navigate(request: Request, path: string): Promise<Response> {
@@ -112,15 +110,12 @@ worker.addEventListener('fetch', (event) => {
 		event.respondWith(receiveShare(request));
 		return;
 	}
-	if (request.method !== 'GET') return;
-	if (FONT_HOSTS.has(url.hostname)) {
-		event.respondWith(staleWhileRevalidate(request));
-		return;
-	}
-	if (url.origin !== worker.location.origin) return;
+	if (request.method !== 'GET' || url.origin !== worker.location.origin) return;
 	if (request.mode === 'navigate') {
 		event.respondWith(navigate(request, url.pathname));
 		return;
 	}
-	if (known.has(url.pathname)) event.respondWith(cacheFirst(request, isHeavy(url.pathname) ? HEAVY : CORE));
+	if (!known.has(url.pathname)) return;
+	const cache = isHeavy(url.pathname) ? HEAVY : isFont(url.pathname) ? FONTS : CORE;
+	event.respondWith(cacheFirst(request, cache));
 });

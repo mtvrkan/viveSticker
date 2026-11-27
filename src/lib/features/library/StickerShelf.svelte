@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
 	import { onMount } from 'svelte';
 	import type { StickerKind } from '#lib/core/types.ts';
 	import { PACK_MAX_STICKERS } from '#lib/core/whatsapp.ts';
-	import { t } from '#lib/i18n/index.svelte.ts';
+	import { i18n, t } from '#lib/i18n/index.svelte.ts';
+	import { pageHref } from '#lib/seo/links.ts';
 	import { listStickers, type LibrarySticker } from './db.ts';
 	import { selectionQuery } from './selection.ts';
 
@@ -193,7 +193,7 @@
 			{t('shelfCancel')}
 		</button>
 		<a
-			href="{resolve('/pack')}{selectionQuery(selected)}"
+			href="{pageHref('library', i18n.locale)}{selectionQuery(selected)}"
 			class="flex min-h-11 items-center gap-2 rounded-full bg-brand px-5 font-semibold"
 		>
 			<svg

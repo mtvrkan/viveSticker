@@ -1,11 +1,11 @@
 <script lang="ts">
 	import { replaceState } from '$app/navigation';
-	import { resolve } from '$app/paths';
 	import { onMount, tick } from 'svelte';
 	import { newId } from '#lib/core/id.ts';
 	import type { StickerKind } from '#lib/core/types.ts';
 	import { formatBytes, PACK_MAX_STICKERS, PACK_MIN_STICKERS } from '#lib/core/whatsapp.ts';
-	import { t } from '#lib/i18n/index.svelte.ts';
+	import { i18n, t } from '#lib/i18n/index.svelte.ts';
+	import { pageHref } from '#lib/seo/links.ts';
 	import {
 		deletePack,
 		deleteStickers,
@@ -76,7 +76,8 @@
 			.map((id) => available.find((item) => item.id === id))
 			.filter((item) => item !== undefined);
 		incoming = [];
-		replaceState(resolve('/pack'), {});
+		// eslint-disable-next-line svelte/no-navigation-without-resolve -- pageHref resolves through $app/paths
+		replaceState(pageHref('library', i18n.locale), {});
 		const first = picked[0];
 		if (!first) return;
 		kind = first.kind;
@@ -244,7 +245,7 @@
 			<h2 class="text-lg font-semibold">{t('packEmptyTitle')}</h2>
 			<p class="max-w-sm text-sm text-muted-foreground">{t('packEmptyText')}</p>
 			<a
-				href={resolve('/')}
+				href={pageHref('home', i18n.locale)}
 				class="flex min-h-11 items-center rounded-full bg-brand px-6 font-semibold shadow-soft"
 			>
 				{t('packEmptyCta')}

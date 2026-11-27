@@ -1,11 +1,17 @@
 import { en } from './en.ts';
 import { tr, type MessageKey } from './tr.ts';
 
-export type Locale = 'tr' | 'en';
+import type { Locale } from './locale.ts';
+
+export type { Locale };
 
 const catalogs: Record<Locale, Record<MessageKey, string>> = { tr, en };
 const storageKey = 'vivesticker.locale';
 
+/**
+ * The URL decides the language (`/` is Turkish, `/en` is English) so every page can be
+ * prerendered and indexed per locale. The root layout writes this during render.
+ */
 export const i18n = $state<{ locale: Locale }>({ locale: 'tr' });
 
 export function t(key: MessageKey): string {
@@ -14,7 +20,11 @@ export function t(key: MessageKey): string {
 
 export function setLocale(locale: Locale): void {
 	i18n.locale = locale;
-	document.documentElement.lang = locale;
+	if (typeof document !== 'undefined') document.documentElement.lang = locale;
+}
+
+/** Records an explicit choice made with the language switch. */
+export function rememberLocale(locale: Locale): void {
 	try {
 		localStorage.setItem(storageKey, locale);
 	} catch {
@@ -22,12 +32,12 @@ export function setLocale(locale: Locale): void {
 	}
 }
 
-export function detectLocale(): Locale {
+/** The language the visitor picked earlier, if any. Browser language alone never redirects. */
+export function rememberedLocale(): Locale | null {
 	try {
 		const saved = localStorage.getItem(storageKey);
-		if (saved === 'tr' || saved === 'en') return saved;
+		return saved === 'tr' || saved === 'en' ? saved : null;
 	} catch {
-		return 'tr';
+		return null;
 	}
-	return navigator.language.toLowerCase().startsWith('tr') ? 'tr' : 'en';
 }

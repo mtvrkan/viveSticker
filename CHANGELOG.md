@@ -4,6 +4,13 @@
 
 ### Added
 
+- Production domain sticker.vivepdf.com, with CI (check, lint, format, unit and browser tests) and automatic GitHub Pages deployment from `main`; Dependabot for npm and GitHub Actions [2026-11-27]
+- English pages under `/en/` and Turkish at the root, with a language switch that keeps the visitor on the same page and remembers the choice [2026-11-27]
+- Guide pages for GIF, video and photo stickers, background removal, animated stickers, packs, a how-to guide, WhatsApp limits, FAQ and privacy, each with breadcrumbs, FAQ and related links [2026-11-27]
+- Per-page SEO: title, description, canonical URL, `hreflang` alternates, Open Graph cards, JSON-LD (WebApplication, FAQ, breadcrumbs), `sitemap.xml` and `robots.txt` [2026-11-27]
+- Dark theme that follows the system, with a light/dark/system switch in the footer and no flash on load [2026-11-27]
+- A file picked before the page finished loading is no longer lost, and the import and language buttons wait until the app is ready instead of ignoring early taps [2026-11-27]
+- Footer with tool and guide links, a 404 page, a skip link, and a prompt to reload when a new version of the app is ready [2026-11-27]
 - Home sticker shelf: browse saved stickers by kind, tap to select and jump straight into a pack with the selection kept [2026-11-27]
 - Paste button on the home card that imports an image or video from the clipboard [2026-11-27]
 - X (Twitter) post links in "Load from link": the photo, GIF or video in the post is fetched through the public FxTwitter API [2026-11-27]
@@ -29,6 +36,7 @@
 
 ### Changed
 
+- Header redesign: frosted sticky bar that gains a border on scroll, a Tools menu with every tool and guide (a full menu on phones), a light/dark toggle, and an "Install app" button when the browser offers installation [2026-11-27]
 - Modern vivid redesign: violet–blue gradient start card, pastel sticker tiles, pill buttons, soft shadows, segmented navigation and a one-tap language switch [2026-11-27]
 - Editor layout: bottom icon bar for tools on phones, canvas beside a sticky tools column on tablets and desktops [2026-11-27]
 

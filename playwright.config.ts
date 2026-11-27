@@ -6,10 +6,12 @@ export default defineConfig({
 	testDir: 'tests/e2e',
 	outputDir: process.env.PW_OUTPUT_DIR ?? 'test-results',
 	reporter: 'list',
-	use: { baseURL: `http://127.0.0.1:${port}/viveSticker/`, locale: 'tr-TR' },
+	use: { baseURL: `http://127.0.0.1:${port}/`, locale: 'tr-TR' },
 	webServer: {
-		command: `export BASE_PATH=viveSticker && pnpm build && pnpm preview --host 127.0.0.1 --port ${port} --strictPort`,
-		url: `http://127.0.0.1:${port}/viveSticker/`,
+		// Production serves from the domain root (sticker.vivepdf.com), so the tests do too.
+		command: `pnpm build && pnpm preview --host 127.0.0.1 --port ${port} --strictPort`,
+		env: { BASE_PATH: '' },
+		url: `http://127.0.0.1:${port}/`,
 		reuseExistingServer: false,
 		timeout: 120_000
 	},

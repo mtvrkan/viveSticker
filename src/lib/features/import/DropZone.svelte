@@ -1,9 +1,18 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import { hydration } from '#lib/components/hydration.svelte.ts';
 	import { t } from '#lib/i18n/index.svelte.ts';
 	import { parseHttpUrl } from './classify.ts';
 
-	let { onfile, onurl }: { onfile: (blob: Blob, name: string) => void; onurl: (url: string) => void } =
-		$props();
+	let {
+		onfile,
+		onurl,
+		heading = 'h1'
+	}: {
+		onfile: (blob: Blob, name: string) => void;
+		onurl: (url: string) => void;
+		heading?: 'h1' | 'h2';
+	} = $props();
 
 	let dragging = $state(false);
 	let linkOpen = $state(false);
@@ -20,6 +29,10 @@
 		const file = files?.[0];
 		if (file) onfile(file, file.name);
 	}
+
+	// On a slow phone the visitor can pick a file before the page has hydrated; that change event
+	// fired with no listener, so pick the file up as soon as the component is live.
+	onMount(() => takeFirst(input.files));
 
 	function submitUrl(event: SubmitEvent) {
 		event.preventDefault();
@@ -95,15 +108,16 @@
 		</svg>
 	</div>
 	<div class="flex flex-col gap-2">
-		<h1 id="import-title" class="text-3xl font-bold tracking-tight sm:text-4xl">
+		<svelte:element this={heading} id="import-title" class="text-3xl font-bold tracking-tight sm:text-4xl">
 			{dragging ? t('importDropActive') : t('importTitle')}
-		</h1>
+		</svelte:element>
 		<p class="max-w-[34ch] text-base">{t('importDescription')}</p>
 	</div>
 	<div class="grid grid-cols-2 gap-2 lg:grid-cols-1">
 		<button
 			id="import-pick"
 			type="button"
+			disabled={!hydration.done}
 			onclick={() => input.click()}
 			class="col-span-2 lg:col-span-1 flex min-h-13 items-center justify-center gap-2 rounded-md bg-card px-3 font-semibold text-secondary-foreground shadow-soft transition-transform duration-(--duration-fast) active:scale-98"
 		>
@@ -125,6 +139,7 @@
 			type="button"
 			aria-expanded={linkOpen}
 			aria-controls="import-link"
+			disabled={!hydration.done}
 			onclick={toggleLink}
 			class={ghostButton}
 		>
@@ -144,7 +159,7 @@
 			</svg>
 			{t('importLink')}
 		</button>
-		<button type="button" onclick={paste} class={ghostButton}>
+		<button type="button" disabled={!hydration.done} onclick={paste} class={ghostButton}>
 			<svg
 				aria-hidden="true"
 				viewBox="0 0 24 24"

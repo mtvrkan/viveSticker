@@ -1,5 +1,8 @@
 <script lang="ts">
-	import { resolve } from '$app/paths';
+	import '@fontsource/anton/latin-400.css';
+	import '@fontsource/anton/latin-ext-400.css';
+	import '@fontsource/caveat/latin-700.css';
+	import '@fontsource/caveat/latin-ext-700.css';
 	import { onMount, untrack } from 'svelte';
 	import SkeletonCard from '#lib/components/SkeletonCard.svelte';
 	import type { SourceMedia } from '#lib/core/types.ts';
@@ -13,7 +16,8 @@
 		type MotionFrame,
 		type MotionSource
 	} from '#lib/features/animate/index.ts';
-	import { t } from '#lib/i18n/index.svelte.ts';
+	import { i18n, t } from '#lib/i18n/index.svelte.ts';
+	import { pageHref } from '#lib/seo/links.ts';
 	import type { MessageKey } from '#lib/i18n/tr.ts';
 	import AdjustPanel from './AdjustPanel.svelte';
 	import CutoutPanel from './CutoutPanel.svelte';
@@ -480,7 +484,7 @@
 						<p role="status" class="flex flex-wrap items-center gap-x-2 text-sm text-success">
 							{t('editorSaved')}
 							<a
-								href={resolve('/pack')}
+								href={pageHref('library', i18n.locale)}
 								class="flex min-h-11 items-center font-semibold underline underline-offset-4"
 							>
 								{t('editorOpenPacks')}

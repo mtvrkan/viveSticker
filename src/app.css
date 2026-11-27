@@ -1,8 +1,9 @@
 @import 'tailwindcss';
 
 @theme {
-	--font-sans: 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
-	--font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+	--font-sans:
+		'Instrument Sans Variable', 'Instrument Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+	--font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
 
 	--color-background: #f7f7fb;
 	--color-foreground: #14142b;
@@ -11,6 +12,8 @@
 	--color-primary: #5b45f5;
 	--color-primary-hover: #4a34e0;
 	--color-brand-tint: #c9c0ff;
+	--color-brand-from: #6d4aff;
+	--color-brand-to: #2f5bea;
 	--color-primary-foreground: #ffffff;
 	--color-secondary: #ede9ff;
 	--color-secondary-foreground: #3b2fc9;
@@ -57,12 +60,103 @@
 	--duration-base: 180ms;
 }
 
+/*
+ * Dark palette. It follows the system unless the footer switch pinned a theme; app.html sets
+ * `data-theme` before first paint so a pinned theme never flashes. Keep both blocks identical.
+ */
+:root[data-theme='dark'] {
+	--color-background: #0f0f1a;
+	--color-foreground: #ececf5;
+	--color-card: #191927;
+	--color-card-foreground: #ececf5;
+	--color-primary: #6f5cff;
+	--color-primary-hover: #8070ff;
+	--color-brand-from: #6247f0;
+	--color-brand-to: #2b52d6;
+	--color-secondary: #262046;
+	--color-secondary-foreground: #cfc7ff;
+	--color-muted: #1f1f2e;
+	--color-muted-foreground: #a3a3bd;
+	--color-accent: #262046;
+	--color-accent-foreground: #cfc7ff;
+	--color-destructive: #ff6b6b;
+	--color-destructive-soft: #3a1618;
+	--color-destructive-foreground: #1a0a0a;
+	--color-success: #4cc38a;
+	--color-success-soft: #12301f;
+	--color-warning: #f0a43a;
+	--color-border: #2a2a3c;
+	--color-input: #3a3a50;
+	--color-ring: #8b7bff;
+	--color-checker-a: #2a2a3c;
+	--color-checker-b: #20202f;
+	--color-tint-1: #241f45;
+	--color-tint-2: #15302a;
+	--color-tint-3: #3a241a;
+	--color-tint-4: #182640;
+	--color-tint-5: #33290f;
+	--shadow-soft: 0 1px 2px rgb(0 0 0 / 0.4), 0 4px 14px rgb(0 0 0 / 0.3);
+	--shadow-float: 0 1px 2px rgb(0 0 0 / 0.4), 0 18px 44px rgb(0 0 0 / 0.45);
+	color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+	:root:not([data-theme='light']) {
+		--color-background: #0f0f1a;
+		--color-foreground: #ececf5;
+		--color-card: #191927;
+		--color-card-foreground: #ececf5;
+		--color-primary: #6f5cff;
+		--color-primary-hover: #8070ff;
+		--color-brand-from: #6247f0;
+		--color-brand-to: #2b52d6;
+		--color-secondary: #262046;
+		--color-secondary-foreground: #cfc7ff;
+		--color-muted: #1f1f2e;
+		--color-muted-foreground: #a3a3bd;
+		--color-accent: #262046;
+		--color-accent-foreground: #cfc7ff;
+		--color-destructive: #ff6b6b;
+		--color-destructive-soft: #3a1618;
+		--color-destructive-foreground: #1a0a0a;
+		--color-success: #4cc38a;
+		--color-success-soft: #12301f;
+		--color-warning: #f0a43a;
+		--color-border: #2a2a3c;
+		--color-input: #3a3a50;
+		--color-ring: #8b7bff;
+		--color-checker-a: #2a2a3c;
+		--color-checker-b: #20202f;
+		--color-tint-1: #241f45;
+		--color-tint-2: #15302a;
+		--color-tint-3: #3a241a;
+		--color-tint-4: #182640;
+		--color-tint-5: #33290f;
+		--shadow-soft: 0 1px 2px rgb(0 0 0 / 0.4), 0 4px 14px rgb(0 0 0 / 0.3);
+		--shadow-float: 0 1px 2px rgb(0 0 0 / 0.4), 0 18px 44px rgb(0 0 0 / 0.45);
+		color-scheme: dark;
+	}
+}
+
+/* `dark:` follows the applied theme: a pinned theme first, otherwise the system preference. */
+@custom-variant dark {
+	&:where([data-theme='dark'], [data-theme='dark'] *) {
+		@slot;
+	}
+	@media (prefers-color-scheme: dark) {
+		&:where(:root:not([data-theme='light']), :root:not([data-theme='light']) *) {
+			@slot;
+		}
+	}
+}
+
 @layer base {
 	* {
 		border-color: var(--color-border);
 	}
 	html {
 		-webkit-text-size-adjust: 100%;
+		color-scheme: light;
 	}
 	body {
 		background: var(--color-background);
@@ -102,7 +196,7 @@
 }
 
 @utility bg-brand {
-	background-image: linear-gradient(135deg, #6d4aff 0%, #2f5bea 100%);
+	background-image: linear-gradient(135deg, var(--color-brand-from) 0%, var(--color-brand-to) 100%);
 	color: var(--color-primary-foreground);
 }
 

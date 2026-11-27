@@ -4,7 +4,7 @@
 
 ### Added
 
-- Production domain sticker.vivepdf.com, with CI (check, lint, format, unit and browser tests) and automatic GitHub Pages deployment from `main`; Dependabot for npm and GitHub Actions [2026-11-27]
+- Production domain sticker.vivepdf.com, with CI (check, lint, format, unit and browser tests) and GitHub Pages hosting; Dependabot for npm and GitHub Actions [2026-11-27]
 - English pages under `/en/` and Turkish at the root, with a language switch that keeps the visitor on the same page and remembers the choice [2026-11-27]
 - Guide pages for GIF, video and photo stickers, background removal, animated stickers, packs, a how-to guide, WhatsApp limits, FAQ and privacy, each with breadcrumbs, FAQ and related links [2026-11-27]
 - Per-page SEO: title, description, canonical URL, `hreflang` alternates, Open Graph cards, JSON-LD (WebApplication, FAQ, breadcrumbs), `sitemap.xml` and `robots.txt` [2026-11-27]
@@ -36,6 +36,7 @@
 
 ### Changed
 
+- The site is published from the `gh-pages` branch with `scripts/deploy-site.sh`; CI checks and tests but no longer deploys. README in English and Turkish [2026-11-27]
 - Header redesign: frosted sticky bar that gains a border on scroll, a Tools menu with every tool and guide (a full menu on phones), a light/dark toggle, and an "Install app" button when the browser offers installation [2026-11-27]
 - Modern vivid redesign: violet–blue gradient start card, pastel sticker tiles, pill buttons, soft shadows, segmented navigation and a one-tap language switch [2026-11-27]
 - Editor layout: bottom icon bar for tools on phones, canvas beside a sticky tools column on tablets and desktops [2026-11-27]

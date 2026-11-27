@@ -1,0 +1,1 @@
+import{ft as e}from"./C91db94S.js";var t=e({done:!1}),n=`vivesticker-share`,r=`shared-file`,i=`x-vivesticker-name`,a=`shared`,o=`vivesticker:skip-waiting`;export{o as a,a as i,r as n,t as o,i as r,n as t};
